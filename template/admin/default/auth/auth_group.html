@@ -1,0 +1,78 @@
+{extend name="base/base" /}
+{block name="title"}{$title}{/block}
+{block name="main"}
+    <div class="layui-btn-group demoTable">
+        <a href="{:url('Auth/add_group')}"><button class="layui-btn layui-btn-normal" style="position: relative;left: 5px;top: 5px;">新增</button></a>
+    </div>
+    <table id="demo" lay-filter="test"></table>
+
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+        //监听表格复选框选择
+        table.on('checkbox(test)', function(obj){
+            console.log(obj)
+        });
+        var $ = layui.$, active = {
+            getCheckData: function(){ //获取选中数据
+                var checkStatus = table.checkStatus('demo')
+                    ,data = checkStatus.data;
+                    layer.alert(JSON.stringify(data));
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //第一个实例
+        table.render({
+            elem: '#demo'
+            ,height: 480
+            ,url: "{:url('auth/group_lists')}" //数据接口
+            ,page: true //开启分页
+            ,cols: [[ //表头
+                {checkbox: true, fixed: true},
+                {field: 'id', title: 'ID', width:80, sort: true, fixed: 'left'}
+                ,{field: 'title', title: '组名', width:100}
+                ,{field: 'rules', title: '权限', width:150}
+                ,{field: 'right', title: '操作', width:150,toolbar:"#barDemo"}
+            ]]
+        });
+
+        //监听工具条
+        table.on('tool(test)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            var tr = obj.tr; //获得当前行 tr 的DOM对象
+            if(layEvent === 'edit'){ //分配权限
+                var id = data.id;
+                window.location.href="{:url('auth/rules')}?group_id="+id;
+            } else if(layEvent === 'del'){ //删除
+                layer.confirm('真的删除行么', function(index){
+                    $.ajax({
+                        url:"{:url('Auth/del_group')}",
+                        type:"get",
+                        data:{
+                            group_id:data.id
+                        },
+                        success:function (data) {
+                            if (data.code == 200){
+                                obj.del();
+                                layer.close(index);
+                            }else {
+                                layer.close(index);
+                                layer.msg(data.msg);
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    });
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">分配权限</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+{/block}

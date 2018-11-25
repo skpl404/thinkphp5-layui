@@ -1,0 +1,48 @@
+{extend name="base/base" /}
+{block name="title"}{/block}
+{block name="main"}
+<form class="layui-form" action="{:url()}" method="post" style="margin-top: 20px">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" required  lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">规则</label>
+        <div class="layui-input-block">
+            {foreach name="rule" item="rule"}
+            <div style="width: 100%;height: 30px">
+                <input type="checkbox" name="like[]" title="{$rule.title}" value="{$rule.id}">
+            </div>
+            {foreach name="rule['two']" item="two"}
+            <div class="layui-input-block" style="margin-left: 50px">
+                <input type="checkbox" name="like[]" title="{$two.title}" value="{$two.id}">
+            </div>
+
+            <div class="layui-input-block" style="margin-left: 100px">
+                {foreach name="two['three']" item="three"}
+                <input type="checkbox" name="like[]" title="{$three.title}" value="{$three.id}">
+                {/foreach}
+            </div>
+            {/foreach}
+            {/foreach}
+        </div>
+    </div>
+    <hr>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            <a href="#" onclick="javascript:history.back(-1);"><button type="reset" class="layui-btn layui-btn-primary">返回</button></a>
+        </div>
+    </div>
+</form>
+<script>
+    //Demo
+    layui.use('form', function(){
+        var form = layui.form;
+    });
+</script>
+{/block}

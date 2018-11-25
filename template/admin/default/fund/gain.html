@@ -1,0 +1,161 @@
+{extend name="base/base" /}
+{block name="title"}{$title}{/block}
+{block name="main"}
+
+<div class=" demoTable">
+    <button class="layui-btn" data-type="getCheckData">批量删除</button>
+    <div class="layui-inline" style="position: relative;left: 5px">
+        <input class="layui-input" name="id" id="demoReload" autocomplete="off" placeholder="订单号/手机号" >
+    </div>
+    <button class="layui-btn" data-type="reload">搜索</button>
+</div>
+
+<table id="demo" lay-filter="test"></table>
+
+<script>
+    layui.use('table', function() {
+        layui.use('util', function () {
+            var util = layui.util;
+            var table = layui.table;
+
+            var $ = layui.$, active = {
+                getCheckData: function(){ //获取选中数据
+                    var checkStatus = table.checkStatus('demo')
+                        ,data = checkStatus.data;
+                    var json = JSON.stringify(data);
+                    if (data == ''){
+                        layer.msg('请选择删除内容');
+                    }else {
+                        $.ajax({
+                            url: "{:url('Fund/dels_fund')}",
+                            type: "get",
+                            data: {
+                                json: json
+                            },
+                            success: function (data) {
+                                if (data.code == 200) {
+                                    layer.msg(data.msg);
+                                    window.location.reload();
+                                } else {
+                                    layer.msg(data.msg);
+                                }
+                            }
+                        })
+                    }
+                }
+            };
+
+            var $ = layui.$, active = {
+                reload: function(){
+                    var demoReload = $('#demoReload');
+                    //执行重载
+                    table.reload('testReload', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                        ,where: {
+                            id: demoReload.val()
+                        }
+                        ,done: function(res, curr, count){
+                            this.where={};
+                        }
+                    });
+                }
+            };
+
+            $('.demoTable .layui-btn').on('click', function(){
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            //第一个实例
+            table.render({
+                elem: '#demo'
+                , limit: 15
+                , height: "full-200"
+                , url: "{:url('Fund/gainData')}" //数据接口
+                , page: true
+                , cols: [[ //表头
+                    {checkbox: true, fixed: true }
+                    , {field: 'fund_id', title: 'ID',width:60, sort: true, fixed: 'left'}
+                    , {field: 'fund_order_sn', title: '订单号', width: 150}
+                    , {field: 'fund_user_name', title: '姓名', width: 100}
+                    , {field: 'user_mobile', title: '手机号', width: 120}
+                    , {field: 'fund_bank_num', title: '银行卡号', width: 120}
+                    , {field: 'fund_money', title: '提现金额', width: 100}
+                    , {field: 'fund_status', title: '状态',width:80,templet:"#titleTpl"}
+                    , {field: 'fund_create_time', title: '申请时间', width: 160,templet:  '<div>{{ getLocalTime(d.fund_create_time) }}</div>'}
+                    , {field: 'fund_update_time', title: '审核时间', width: 160,templet:  '<div>{{ getLocalTime(d.fund_update_time) }}</div>'}
+                    , {field: 'right', title: '操作', width:180 ,toolbar: "#barDemo"}
+                ]]
+                , id:'testReload'
+            });
+            //监听工具条
+            table.on('tool(test)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                var tr = obj.tr; //获得当前行 tr 的DOM对象
+                if (layEvent === 'verify1') {
+                    layer.confirm('确认通过吗', function (index) {
+                        $.ajax({
+                            url:"{:url('Fund/verify_check')}",
+                            type:"get",
+                            data:{
+                                status:1,
+                                fund_id:data.fund_id
+                            },
+                            success:function (data) {
+                                if (data.code == 200){
+                                    window.location.reload();
+                                    layer.close(index);
+                                }else {
+                                    layer.close(index);
+                                    layer.msg(data.msg);
+                                }
+                            }
+                        });
+                    });
+                }else if (layEvent === 'verify2'){
+                    layer.confirm('确认不通过吗', function (index) {
+                        $.ajax({
+                            url:"{:url('Fund/verify_check')}",
+                            type:"get",
+                            data:{
+                                status:2,
+                                fund_id:data.fund_id
+                            },
+                            success:function (data) {
+                                if (data.code == 200){
+                                    window.location.reload();
+                                    layer.close(index);
+                                }else {
+                                    layer.close(index);
+                                    layer.msg(data.msg);
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+        });
+    })
+</script>
+<script>
+    function getLocalTime(nS) {
+        return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,' ');
+    }
+</script>
+<script type="text/html" id="titleTpl">
+    {{#  if(d.fund_status == '1'){ }}
+    <span style="color: #F581B1;">通过</span>
+    {{#  } else if (d.fund_status == '0'){ }}
+    <span style="color: #F581B1;">待审核</span>
+    {{#  } else if (d.fund_status == '2'){ }}
+    <span style="color: #F581B1;">未通过</span>
+    {{#  } }}
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="verify1">通过</a>
+    <a class="layui-btn layui-btn-xs" lay-event="verify2">不通过</a>
+</script>
+{/block}

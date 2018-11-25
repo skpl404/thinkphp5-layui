@@ -1,0 +1,78 @@
+{extend name="base/base" /}
+{block name="title"}{$title}{/block}
+{block name="main"}
+
+<div class="layui-btn-group demoTable">
+    <a href="{:url('Goods/add_terrace')}"><button class="layui-btn layui-btn-normal" style="position: relative;left: 5px;top: 5px;">新增</button></a>
+</div>
+
+<table id="demo" lay-filter="test"></table>
+
+<script>
+    layui.use('table', function() {
+        layui.use('util', function () {
+            var util = layui.util;
+            var table = layui.table;
+            //第一个实例
+            table.render({
+                elem: '#demo'
+                , height: 480
+                , url: "{:url('Goods/terraceData')}" //数据接口
+                , page: true
+                , cols: [[ //表头
+                    {field: 'terr_id', title: 'ID',width:60, sort: true, fixed: 'left'}
+                    , {field: 'terr_title', title: '名称', width: 120}
+                    , {field: 'terr_create_time', title: '创建时间', width: 130,  templet:  '<div>{{ getLocalTime(d.terr_create_time) }}</div>'}
+                    , {field: 'terr_update_time', title: '更新时间', width: 130,  templet:  '<div>{{ getLocalTime(d.terr_update_time) }}</div>'}
+                    , {field: 'right', title: '操作', width:150 ,toolbar: "#barDemo"}
+                ]]
+            });
+            //监听工具条
+            table.on('tool(test)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                var tr = obj.tr; //获得当前行 tr 的DOM对象
+                if (layEvent === 'edit') { //编辑
+                    window.location.href = "{:url('Goods/add_terrace')}?terr_id=" + data.terr_id
+                } else if (layEvent === 'del') { //删除
+                    layer.confirm('真的删除行么', function (index) {
+                        $.ajax({
+                            url:"{:url('Goods/del_terrace')}",
+                            type:"get",
+                            data:{
+                                terr_id:data.terr_id
+                            },
+                            success:function (data) {
+                                if (data.code == 200){
+                                    obj.del();
+                                    layer.close(index);
+                                }else {
+                                    layer.close(index);
+                                    layer.msg(data.msg);
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+        })
+    })
+
+</script>
+<script type="text/html" id="titleTpl">
+    {{#  if(d.level_status == '1'){ }}
+    <span style="color: #F581B1;">正常</span>
+    {{#  } else if (d.level_status == '0'){ }}
+    <span style="color: #F581B1;">禁用</span>
+    {{#  } }}
+</script>
+<script>
+    function getLocalTime(nS) {
+        return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,' ');
+    }
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+{/block}

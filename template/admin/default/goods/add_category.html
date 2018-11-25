@@ -1,0 +1,208 @@
+{extend name="base/base" /}
+{block name="title"}{$title}{/block}
+{block name="main"}
+<form class="layui-form" action="{:url()}" method="post">
+    <div class="layui-form-item">
+        <label class="layui-form-label">属性</label>
+        <div class="layui-input-block">
+            <input type="text" style="width: 100px;display: inline-block" name="virtue" value="" required  lay-verify="required" placeholder="请输入属性" autocomplete="off" class="layui-input virtue-input">
+            <button class="layui-btn layui-btn-primary layui-btn-sm virtue-btn">
+                <i class="layui-icon">&#xe654;</i>
+            </button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm virtue-del">
+                <i class="layui-icon">&#xe640;</i>
+            </button>
+        </div>
+    </div>
+    <hr>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-warm virtue-table dis-btn">生成规格</button>
+            <a href="#" onclick="javascript:history.back(-1);" class="dis-btn"><button type="reset" class="layui-btn layui-btn-primary">返回</button></a>
+        </div>
+    </div>
+    <input type="hidden" value="{$goods_id}" name="goods_id" class="goods_id">
+</form>
+<script>
+    var html;
+
+    layui.use('form', function(){
+        var form = layui.form;
+    });
+
+    //添加属性框
+    $('body').on('click','.virtue-btn',function () {
+        if ($(this).prev().val() == ''){
+            layer.msg('请输入属性值');
+            $(this).prev().focus();
+            return false;
+        }else {
+            $(this).before('<input type="text" style="width: 100px;display: inline-block" name="virtue" value="" required  lay-verify="required" placeholder="请输入属性" autocomplete="off" class="layui-input virtue-input">')
+        }
+    });
+    //删除属性框
+    $('.virtue-del').click(function () {
+        var lenght = $("input[name='virtue']").length;
+        if (lenght == 1){
+            layer.msg('属性值必须保证为1个')
+        }else {
+            $(this).prev().prev().remove();
+        }
+    });
+
+    $('body').on('blur','.virtue-input',function () {
+        if ($(this).val() == ''){
+            layer.msg('请输入属性值');
+            $(this).focus();
+            return false;
+        }
+        $('.virtue-div').remove();
+        var str = [];
+        $("input[name='virtue']").each(function(){
+            str.push($(this).val());
+        });
+        str.forEach(function (item,index) {
+            $('.virtue-input').parent().parent().after(' <div class="layui-form-item virtue-div"><label class="layui-form-label"> ' + item + ' </label> <div class="layui-input-block"> <input type="text" style="width: 100px;display: inline-block" name="' + index + '" value="" required  lay-verify="required" placeholder="请输入属性值" autocomplete="off" class="layui-input "> <button class="layui-btn layui-btn-primary layui-btn-sm virtue-one"> <i class="layui-icon">&#xe654;</i> </button><button class="layui-btn layui-btn-primary layui-btn-sm virtue-del-one"> <i class="layui-icon">&#xe640;</i> </button> </div></div>')
+        })
+    });
+
+    //添加属性值框
+    $('body').on('click','.virtue-one',function () {
+        if ($(this).prev().val() == ''){
+            layer.msg('请输入属性值');
+            $(this).prev().focus();
+            return false;
+        }else {
+            var name = $(this).prev().attr('name');
+            $(this).before('<input type="text" style="width: 100px;display: inline-block" name="'+ name +'" value="" required  lay-verify="required" placeholder="请输入属性" autocomplete="off" class="layui-input">')
+        }
+    });
+
+    //删除属性值框
+    $('body').on('click','.virtue-del-one',function () {
+        $(this).prev().prev().remove();
+        return false;
+    });
+
+    //生成规格表单
+    var str = [];
+    $('.virtue-table').one('click',function () {
+
+        $("input[name='virtue']").each(function(){
+            str.push($(this).val());
+        });
+        $(this).before(' <form enctype="multipart/form-data" id="formData" method="post" action="{:url()}" class="layui-form"><table class="layui-table"> <colgroup> <col width="150"> <col width="150"> <col> </colgroup> <thead> <tr> <th class="th-head">库存</th> <th>价格</th>  <th>图片</th></tr> </thead><tbody class="tr-head"> </tbody> </table><button class="layui-btn sub-category">立即提交</button> </form>')
+        str.forEach(function (item,index) {
+            $('.th-head').before('<th>' + item + '</th>')
+        });
+        var one = [];
+        for (var i = 0;i < str.length;i ++) {
+            one.push([]);
+            $("input[name='" + i + "']").each(function(){
+                one[i].push($(this).val());
+            });
+        }
+
+        var map = {};
+        str.forEach(function (item,index) {
+            map[item] = one[index]
+        });
+        var cate = JSON.stringify(map);
+        $.ajax({
+            url:"{:url('Goods/category')}",
+            type:"get",
+            data:{
+                goods_id:$('.goods_id').val(),
+                cate:cate
+            },
+            success:function (res) {
+
+            }
+        });
+
+        var  arr = [];
+        var  arr2 = [];
+        var num = -1;
+
+        get_for(num)
+        function get_for(num){
+            num++;
+            if(num<one.length){
+                for(var a=0;a<one[num].length;a++){
+                    arr2[num] = one[num][a];
+                    get_for(num);
+                }
+            }else{
+                arr.push([...arr2])
+            }
+        }
+
+        arr.forEach(function (item,index1) {
+            var str = '';
+
+            item.forEach(function (item,index) {
+                str+= '<td><input type="text" name="virtue" value="' + item +'" style="width: 100px"></td>';
+            })
+
+            str += "<td><input type='hidden' value='{$goods_id}' name='goods_id' style='width: 100px'><input type='text' name='stock' style='width: 100px'></td><td><input type='text' name='price'></td><td><input value='' type='text' name='file_img'><div style='display: inline-block' class='layui-upload'> <button type='button' class='layui-btn layui-btn-normal test8'>选择文件</button><button onclick='btn(this)' type='button' class='layui-btn test9'>开始上传</button></div></td>";
+            str = '<tr>'+str+'</tr>';
+            $('.tr-head').append(str);
+            //选完文件后不自动上传
+            layui.use('upload', function(){
+                var upload = layui.upload;
+                upload.render({
+                    elem: '.test8'
+                    ,url: "{:url('File/upload')}" //上传接口
+                    ,auto: false
+                    //,multiple: true
+                    ,bindAction: '.test9'
+                    ,done: function(res){
+                        if (res.code == 200){
+                            objs(res.data)
+                        }
+                    }
+                });
+            });
+        });
+        $('.dis-btn').css('display','none');
+        return false;
+    });
+
+    function btn(res){
+        html = res;
+    }
+
+    function objs(param){
+        $(html).parent().prev().val(param);
+    }
+
+    $('body').on('click','.sub-category',function () {
+        var pop = [];
+        $('.layui-table tr').each(function (index,item) {
+            if(index){
+                var tip = {};
+                $(this).find("input").each(function (index,item) {
+                    tip[(index)<str.length?str[index]:$(item).attr('name')]=($(item).val())
+                });
+                pop.push(tip);
+            }
+        });
+        $.ajax({
+            url:"{:url('Goods/category_price')}",
+            type:'post',
+            data:{
+                pop:JSON.stringify(pop),
+                str:JSON.stringify(str)
+            },
+            success:function (data) {
+                if (data.code ==  200){
+                    window.location.href = "{:url('Goods/goodslist')}"
+                }else{
+                    layer.msg('失败');
+                }
+            }
+        })
+        return false;
+    })
+</script>
+{/block}

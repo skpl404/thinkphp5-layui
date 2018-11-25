@@ -1,0 +1,56 @@
+{extend name="base/base" /}
+{block name="title"}{$title}{/block}
+{block name="main"}
+
+<table id="demo" lay-filter="test"></table>
+
+<script>
+    layui.use('table', function() {
+        layui.use('util', function () {
+            var util = layui.util;
+            var table = layui.table;
+            //第一个实例
+            table.render({
+                elem: '#demo'
+                , height: 480
+                , url: "{:url('user/userLists')}" //数据接口
+                , page: true
+                , cols: [[ //表头
+                    {field: 'user_id', title: 'ID',width:60, sort: true, fixed: 'left'}
+                    , {field: 'user_mobile', title: '手机号', width: 120}
+                    , {field: 'user_avatar', title: '头像', width: 100}
+                    , {field: 'user_name', title: '昵称', width: 100}
+                    , {field: 'user_balance', title: '余额', width: 80}
+                    , {field: 'user_level', title: '等级', width: 80}
+                    , {field: 'user_fans', title: '粉丝数量', width: 80}
+                    , {field: 'user_reg_ip', title: '注册IP', width: 110}
+                    , {field: 'user_reg_time', title: '注册时间', width: 130,  templet:  '<div>{{ getLocalTime(d.user_reg_time) }}</div>'}
+                    , {field: 'user_status', title: '状态',templet:"#titleTpl"}
+                    ]]
+                ,done:function(res, curr, count){
+//                    $("[data-field = 'admin_status']").children().each(function(){
+//                        if($(this).text() == '0'){
+//                            $(this).text("禁用");
+//                        }else if($(this).text() == '1'){
+//                            $(this).text("正常");
+//                        }
+//                    })
+                }
+            });
+        })
+    })
+
+</script>
+<script type="text/html" id="titleTpl">
+    {{#  if(d.user_status == '1'){ }}
+    <span style="color: #F581B1;">正常</span>
+    {{#  } else if (d.user_status == '0'){ }}
+    <span style="color: #F581B1;">禁用</span>
+    {{#  } }}
+</script>
+<script>
+    function getLocalTime(nS) {
+        return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,' ');
+    }
+</script>
+{/block}

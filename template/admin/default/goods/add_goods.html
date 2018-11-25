@@ -1,0 +1,157 @@
+{extend name="base/base" /}
+{block name="title"}{$title}{/block}
+{block name="main"}
+<form class="layui-form" action="{:url()}" style="margin-top: 20px" method="post">
+    <input type="hidden" name="goods_id" value="{$info.goods_id|default=''}">
+    <div class="layui-form-item">
+        <label class="layui-form-label">标示</label>
+        <div class="layui-input-block">
+            <input type="text" name="indicate" value="{$info.goods_title|default=''}" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" value="{$info.goods_title|default=''}" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">副标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="sub_title" value="{$info.goods_subtitle|default=''}" required  value=""  lay-verify="required" placeholder="请输入副标题" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">库存</label>
+        <div class="layui-input-block">
+            <input type="text" name="stock" required  value="{$info.goods_stock|default=''}"  lay-verify="required" placeholder="请输入库存" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">原价</label>
+        <div class="layui-input-block">
+            <input type="text" name="original_price" required  value="{$info.goods_original_price|default=''}"  lay-verify="required" placeholder="请输入原价" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">现价</label>
+        <div class="layui-input-block">
+            <input type="text" name="current_price" required  value="{$info.goods_current_price|default=''}"  lay-verify="required" placeholder="请输入现价" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">链接</label>
+        <div class="layui-input-block">
+            <input type="text" name="link" required  value="{$info.goods_link|default=''}"  lay-verify="required" placeholder="请输入链接" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">浏览量</label>
+        <div class="layui-input-block">
+            <input type="text" name="browse" required  value="{$info.goods_browse|default=''}"  lay-verify="required" placeholder="请输入浏览量" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">销售量</label>
+        <div class="layui-input-block">
+            <input type="text" name="sales" required  value="{$info.goods_sales|default=''}"  lay-verify="required" placeholder="请输入销售量" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">平台类型</label>
+        <div class="layui-input-block">
+            <select name="goods_terr" lay-verify="required" id="terrace">
+                <option value="0"></option>
+                {foreach name="terrace" item="terr"}
+                <option value="{$terr.terr_id}">{$terr.terr_title}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">商城类型</label>
+        <div class="layui-input-block">
+            <select name="goods_type" lay-verify="required" id="type">
+                <option value="0"></option>
+                {foreach name="kind" item="kind"}
+                <option value="{$kind.type_id}">{$kind.type_title}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">行业类型</label>
+        <div class="layui-input-block">
+            <select name="goods_trade" lay-verify="required" id="trade">
+                <option value="0"></option>
+                {foreach name="trade" item="trade"}
+                <option value="{$trade.trade_id}">{$trade.trade_title}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <input type="hidden" name="img" id="img">
+    <div class="layui-form-item">
+        <label class="layui-form-label">主图</label>
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" id="test1">
+                <i class="layui-icon">&#xe67c;</i>上传图片
+            </button>
+            <img src="{$info.goods_img}" style="width: 60px">
+        </div>
+
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="status" value="上架" title="上架" checked>
+            <input type="radio" name="status" value="下架" title="下架">
+        </div>
+    </div>
+    <hr>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn sub-btn"  lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            <a href="#" onclick="javascript:history.back(-1);"><button type="reset" class="layui-btn layui-btn-primary">返回</button></a>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use('form', function(){
+        var form = layui.form;
+    });
+
+    layui.use('upload', function(){
+        var upload = layui.upload;
+
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#test1' //绑定元素
+            ,url: "{:url('File/upload')}" //上传接口
+            ,number:1
+            ,before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                layer.load(); //上传loading
+            }
+            ,done: function(res, index, upload){
+                layer.closeAll('loading'); //关闭loading
+                if(res.code == 200){
+                    $('#img').val(res.data);
+                }else {
+                    layer.msg('上传失败');
+                }
+            }
+            ,error: function(index, upload){
+                layer.closeAll('loading'); //关闭loading
+            }
+        });
+    });
+
+    var terrace = "{$info.goods_terr|default=''}";
+    $("#terrace option[value='"+terrace+"']").attr("selected","selected");
+    var type = "{$info.goods_type|default=''}";
+    $("#type option[value='"+type+"']").attr("selected","selected");
+    var trade  = "{$info.goods_trade|default=''}";
+    $("#trade option[value='"+trade+"']").attr("selected","selected");
+</script>
+{/block}

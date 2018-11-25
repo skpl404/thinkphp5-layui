@@ -1,0 +1,36 @@
+{extend name="base/base" /}
+{block name="title"}{/block}
+{block name="main"}
+<form class="layui-form" action="{:url()}" method="post" style="margin-top: 20px">
+    <div class="layui-form-item">
+        <label class="layui-form-label">单选框</label>
+        <div class="layui-input-block">
+            {foreach name="group" item="group"}
+            <input class="auth_groups" type="radio" name="group_id" value="{$group.id}" title="{$group.title}">
+            {/foreach}
+        </div>
+    </div>
+    <input type="hidden" value="{$admin_id}" name="admin_id">
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            <a href="#" onclick="javascript:history.back(-1);"><button type="reset" class="layui-btn layui-btn-primary">返回</button></a>
+        </div>
+    </div>
+</form>
+<script>
+    //Demo
+    layui.use('form', function(){
+        var form = layui.form;
+    });
+    $(function(){
+        var group = [{$user_group}];
+        $('.auth_groups').each(function(){
+            if( $.inArray( parseInt(this.value,10),group )>-1 ){
+                $(this).prop('checked',true);
+            }
+        });
+    });
+</script>
+{/block}

@@ -1,0 +1,60 @@
+{extend name="base/base" /}
+{block name="main"}
+<form class="layui-form" action="{:url()}" method="post">
+    <div class="layui-form-item">
+        <label class="layui-form-label">属性</label>
+        <div class="layui-input-block">
+            {foreach name="cate" item="cate"}
+            <input type="text" style="width: 100px;display: inline-block" readonly name="virtue" value="{$cate.category_name}" required  lay-verify="required" placeholder="请输入属性" autocomplete="off" class="layui-input virtue-input">
+            {/foreach}
+        </div>
+    </div>
+    {foreach name="gory" item="gory"}
+    <div class="layui-form-item">
+        <label class="layui-form-label">{$gory.category_name}</label>
+        <div class="layui-input-block">
+            {foreach name="gory.value" item="gorys"}
+            <input type="text" style="width: 100px;display: inline-block" readonly name="virtue" value="{$gorys.category_value}" required  lay-verify="required" placeholder="请输入属性" autocomplete="off" class="layui-input virtue-input">
+            {/foreach}
+        </div>
+    </div>
+    {/foreach}
+
+    <table class="layui-table">
+        <colgroup>
+            <col width="150">
+            <col width="150">
+            <col width="150">
+            <col width="150">
+            <col>
+        </colgroup>
+        <thead>
+        <tr>
+            <th>规则</th>
+            <th>价格</th>
+            <th>库存</th>
+            <th>图片</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach name="table" item="table"}
+        <tr>
+            <td>{$table.str}</td>
+            <td>{$table.price_money}</td>
+            <td>{$table.price_stock}</td>
+            <td><img src="{$table.price_img}" style="width: 50px"></td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <a href="{:url('Goods/overload')}?goods_id={$goods_id}" class="layui-btn layui-btn-warm virtue-table dis-btn">重载规格</a>
+            <a href="#" onclick="javascript:history.back(-1);" class="dis-btn"><button type="reset" class="layui-btn layui-btn-primary">返回</button></a>
+        </div>
+    </div>
+</form>
+{/block}

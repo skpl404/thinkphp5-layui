@@ -1,0 +1,90 @@
+{extend name="base/base" /}
+{block name="title"}{$title}{/block}
+{block name="main"}
+    <div class="layui-btn-group demoTable">
+        <a href="{:url('Auth/add_rules')}"><button class="layui-btn layui-btn-normal" style="position: relative;left: 5px;top: 5px;">新增</button></a>
+    </div>
+    <table id="demo" lay-filter="test"></table>
+
+<script>
+    layui.use('table', function() {
+        layui.use('util', function () {
+            var util = layui.util;
+            var table = layui.table;
+            //监听表格复选框选择
+            table.on('checkbox(test)', function (obj) {
+                console.log(obj)
+            });
+            var $ = layui.$, active = {
+                getCheckData: function () { //获取选中数据
+                    var checkStatus = table.checkStatus('demo')
+                        , data = checkStatus.data;
+                    layer.alert(JSON.stringify(data));
+                }
+            };
+            $('.demoTable .layui-btn').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            //第一个实例
+            table.render({
+                elem: '#demo'
+                , height: 480
+                , url: "{:url('auth/rule_lists')}" //数据接口
+                , page: true
+                , cols: [[ //表头
+                    {checkbox: true, fixed: true},
+                    {field: 'id', title: 'ID', width: 80, sort: true, fixed: 'left'}
+                    , {field: 'name', title: '规则', width: 150}
+                    , {field: 'title', title: '名称', width: 100}
+                    , {field: 'right', title: '操作', width: 150,toolbar: "#barDemo"}
+                ]]
+                ,done:function(res, curr, count){
+//                    $("[data-field = 'admin_status']").children().each(function(){
+//                        if($(this).text() == '0'){
+//                            $(this).text("禁用");
+//                        }else if($(this).text() == '1'){
+//                            $(this).text("正常");
+//                        }
+//                    })
+                }
+            });
+
+            //监听工具条
+            table.on('tool(test)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                var tr = obj.tr; //获得当前行 tr 的DOM对象
+                if (layEvent === 'edit') { //编辑
+                    window.location.href = "{:url('Auth/add_rules')}?rule_id=" + data.id
+                } else if (layEvent === 'del') { //删除
+                    layer.confirm('真的删除行么', function (index) {
+                        $.ajax({
+                            url:"{:url('Auth/del_rules')}",
+                            type:"get",
+                            data:{
+                                rule_id:data.id
+                            },
+                            success:function (data) {
+                                if (data.code == 200){
+                                    obj.del();
+                                    layer.close(index);
+                                }else {
+                                    layer.close(index);
+                                    layer.msg(data.msg);
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+        })
+    })
+
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+{/block}

@@ -1,0 +1,51 @@
+{extend name="base/base" /}
+{block name="title"}{/block}
+{block name="main"}
+<form class="layui-form" action="{:url()}" method="post" style="margin-top: 20px">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" value="{$info.title|default=''}" required  lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">规则</label>
+        <div class="layui-input-block">
+            <input type="text" name="rule" value="{$info.name|default=''}" required  lay-verify="required" placeholder="请输入规则" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择框</label>
+        <div class="layui-input-block">
+            <select name="pid" lay-verify="required" id="select-rule">
+                <option value="0">顶级</option>
+                {foreach name="rule" item="rule"}
+                <option value="{$rule.id}" >{$rule.title}</option>
+                    {if !empty($rule.child)}
+                    {foreach name="rule.child" item="two"}
+                        <option value="{$two.id}">|---{$two.title}</option>
+                    {/foreach}
+                    {/if}
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <input type="hidden" value="{$info.id|default=''}" name="rule_id">
+    <hr>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            <a href="#" onclick="javascript:history.back(-1);"><button type="reset" class="layui-btn layui-btn-primary">返回</button></a>
+        </div>
+    </div>
+</form>
+<script>
+    //Demo
+    layui.use('form', function(){
+        var form = layui.form;
+    });
+    var info_id = "{$info.pid}";
+    $("#select-rule option[value='"+info_id+"']").attr("selected","selected");
+</script>
+{/block}

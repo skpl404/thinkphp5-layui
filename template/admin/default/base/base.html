@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>{block name="title"}标题{/block}</title>
+    <link rel="stylesheet" href="__LAYUI__/css/layui.css">
+    <script src="__LAYUI__/layui.js"></script>
+    <script src="__ADMIN__/jquery.js"></script>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <a href="{:url('Auth/index')}"><div class="layui-logo"><h2 style="color: white">管理系统后台</h2></div></a>
+        <!-- 头部区域（可配合layui已有的水平导航） -->
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:;">
+                    {if empty($Think.session.admin.admin_avatar)}
+                    <img src="{$avatar}" class="layui-nav-img">
+                    {else/}
+                    <img src="{$Think.session.admin.admin_avatar}" class="layui-nav-img">
+                    {/if}
+                    <!--<img src="http://t.cn/RCzsdCq" class="layui-nav-img">-->
+                    {$Think.session.admin.admin_username}
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">基本资料</a></dd>
+                    <!--<dd><a href="">安全设置</a></dd>-->
+                    <dd><a href="{:url('Login/layout')}">退出</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+                {foreach name="str" item="str"}
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" href="javascript:;">{$str.title}</a>
+                    <dl class="layui-nav-child">
+                        {if !empty($str.child)}
+                        {foreach name="str.child" item="child"}
+                        <dd><a href="{:url($child.name)}">{$child.title}</a></dd>
+                        {/foreach}
+                        {/if}
+                    </dl>
+                </li>
+                {/foreach}
+            </ul>
+
+        </div>
+    </div>
+    <div class="layui-body">
+        {block name="main"}
+        {/block}
+    </div>
+
+</div>
+<script>
+    //JavaScript代码区域
+    layui.use('element', function(){
+        var element = layui.element;
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+{extend name="base/base" /}
+{block name="title"}{$title}{/block}
+{block name="main"}
+    <div class="layui-btn-group demoTable">
+        <a href="{:url('add_admin')}"><button class="layui-btn layui-btn-normal" style="position: relative;left: 5px;top: 5px;">新增</button></a>
+        <button class="layui-btn " data-type="getCheckData" style="position: relative;left: 10px;top: 5px;">批量删除</button>
+    </div>
+    <table id="demo" lay-filter="test"></table>
+<script>
+    layui.use('table', function() {
+        layui.use('util', function () {
+            var util = layui.util;
+            var table = layui.table;
+            //监听表格复选框选择
+            table.on('checkbox(test)', function (obj) {
+//                console.log(obj)
+            });
+            var $ = layui.$, active = {
+                getCheckData: function () { //获取选中数据
+                    var checkStatus = table.checkStatus('demo')
+                        , data = checkStatus.data;
+                    var json = JSON.stringify(data);
+                    if (data == ''){
+                        layer.msg('请选择删除内容');
+                    }else {
+                        $.ajax({
+                            url:"{:url('Auth/del_batch_admin')}",
+                            type:"get",
+                            data:{
+                                json:json
+                            },
+                            success:function (data) {
+                                if (data.code == 200){
+                                    layer.msg(data.msg);
+                                    window.location.reload();
+                                }else {
+                                    layer.msg(data.msg);
+                                }
+                            }
+                        })
+                    }
+                }
+            };
+            $('.demoTable .layui-btn').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            //第一个实例
+            table.render({
+                elem: '#demo'
+                , height: 480
+                , url: "{:url('auth/admin_datas')}" //数据接口
+                , page: true //开启分页
+                , cols: [[ //表头
+                    {checkbox: true, fixed: true},
+                    {field: 'admin_id', title: 'ID', width: 80, sort: true, fixed: 'left'}
+                    , {field: 'admin_username', title: '账号', width: 100}
+                    , {field: 'admin_pwd', title: '密码', width: 100}
+                    , {
+                        field: 'admin_create_time',
+                        title: '创建时间', width: 180,
+                        templet:  '<div>{{ getLocalTime(d.admin_create_time) }}</div>'
+                    }
+                    , {
+                        field: 'admin_last_time',
+                        title: '最后登录时间',
+                        width: 180,
+                        templet: '<div>{{ getLocalTime(d.admin_last_time) }}</div>'
+                    }
+                    , {field: 'admin_status', title: '状态', width: 60,templet:"#titleTpl"}
+                    , {field: 'right', title: '操作', width: 150, toolbar: "#barDemo"}
+                ]]
+                ,done:function(res, curr, count){
+//                    $("[data-field = 'admin_status']").children().each(function(){
+//                        if($(this).text() == '0'){
+//                            $(this).text("禁用");
+//                        }else if($(this).text() == '1'){
+//                            $(this).text("正常");
+//                        }
+//                    })
+                }
+            });
+
+            //监听工具条
+            table.on('tool(test)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                var tr = obj.tr; //获得当前行 tr 的DOM对象
+                if (layEvent === 'edit') { //编辑
+                    window.location.href = "{:url('Auth/add_admin')}?admin_id=" + data.admin_id
+                }else if (layEvent === 'detail'){
+                    window.location.href = "{:url('Auth/group')}?admin_id=" + data.admin_id
+                }else if (layEvent === 'del') { //删除
+                    layer.confirm('真的删除行么', function (index) {
+                        $.ajax({
+                            url:"{:url('Auth/del_admin')}",
+                            type:"get",
+                            data:{
+                                admin_id:data.admin_id
+                            },
+                            success:function (data) {
+                                if (data.code == 200){
+                                    obj.del();
+                                    layer.close(index);
+                                }else {
+                                    layer.close(index);
+                                    layer.msg(data.msg);
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+        })
+    })
+
+</script>
+<script type="text/html" id="titleTpl">
+    {{#  if(d.admin_status == '1'){ }}
+    <span style="color: #F581B1;">正常</span>
+    {{#  } else if (d.admin_status == '0'){ }}
+    <span style="color: #F581B1;">禁用</span>
+    {{#  } }}
+</script>
+<script>
+    function getLocalTime(nS) {
+        return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,' ');
+    }
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="detail">授权</a>
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+{/block}
+
+

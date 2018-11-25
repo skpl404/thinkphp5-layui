@@ -1,0 +1,40 @@
+{extend name="base/base" /}
+{block name="title"}{/block}
+{block name="main"}
+<form class="layui-form" action="{:url()}" style="margin-top: 20px" method="post">
+    <input type="hidden" value="{$info.type_id|default=''}" name="type_id">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" value="{$info.type_title|default=''}" required  lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">平台类型</label>
+        <div class="layui-input-block">
+            <select name="terr" lay-verify="required" id="terrace">
+                <option value="0"></option>
+                {foreach name="terrace" item="terr"}
+                <option value="{$terr.terr_id}">{$terr.terr_title}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <hr>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            <a href="#" onclick="javascript:history.back(-1);"><button type="reset" class="layui-btn layui-btn-primary">返回</button></a>
+        </div>
+    </div>
+</form>
+<script>
+    //Demo
+    layui.use('form', function(){
+        var form = layui.form;
+    });
+    var terrace = "{$info.type_terr_id|default=''}";
+    $("#terrace option[value='"+terrace+"']").attr("selected","selected");
+</script>
+{/block}

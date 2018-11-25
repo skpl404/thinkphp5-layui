@@ -1,0 +1,69 @@
+{extend name="base/base" /}
+{block name="title"}{$title}{/block}
+{block name="main"}
+    <form class="layui-form">
+        {foreach name="rule" item="rule"}
+        <div style="width: 100%;height: 30px;background-color: #E6E6E6">
+            <input type="checkbox" name="like" title="{$rule.title}" value="{$rule.id}">
+        </div>
+        {foreach name="rule['two']" item="two"}
+        <div class="layui-input-block" style="margin-left: 50px">
+            <input type="checkbox" name="like" title="{$two.title}" value="{$two.id}">
+        </div>
+
+        <div class="layui-input-block" style="margin-left: 100px">
+            {foreach name="two['three']" item="three"}
+                <input type="checkbox" name="like" title="{$three.title}" value="{$three.id}">
+            {/foreach}
+        </div>
+        {/foreach}
+        {/foreach}
+        <input type="hidden" value="{$group_id}" class="group-id">
+        <div class="layui-form-item" style="margin-top: 50px">
+            <div style="margin-left: 20px">
+                <button class="layui-btn sub-btns">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+
+<script>
+    layui.use('form', function(){
+        var form = layui.form;
+    });
+    var arr = "{$arr}";
+    arr = arr.split(',');
+    var str = '';
+    for (var i = 0; i < arr.length; i ++){
+        str = arr[i];
+        $("input[name='like'][value='"+ str +"']").attr("checked","checked");
+    }
+    $('.sub-btns').click(function () {
+        var str = "";
+        $("input:checkbox[name='like']:checked").each(function(i) {
+            var val = $(this).val();
+            str = str + val + ",";
+        });
+        str = str.substring(0,str.length-1);
+        if (str == ''){
+            return false;
+        }
+        var group_id = $('.group-id').val();
+        $.ajax({
+            type:"get",
+            url:"{:url('Auth/rule_like')}",
+            data:{
+                group_id:group_id,
+                rules:str
+            },
+            success:function (data) {
+                 if (data.code == 200){
+                    window.location.href = "{:url('Auth/auth_group')}"
+                }else {
+                    layer.msg(data.msg)
+                }
+            }
+        })
+    })
+</script>
+{/block}
